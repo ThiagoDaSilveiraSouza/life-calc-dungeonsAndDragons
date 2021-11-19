@@ -1,6 +1,4 @@
-import { useState } from "react";
-import styled from "styled-components";
-import "./styles.css";
+import { useState, useRef } from "react";
 
 // services
 import { classList } from "./services/classList";
@@ -8,52 +6,21 @@ import { classList } from "./services/classList";
 // components
 import { Counter } from "./components";
 
-const Form = styled.form`
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-`;
-
-const Label = styled.label`
-  flex: 1 1 100%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  h3 {
-    flex: 1 1 100%;
-    text-transform: uppercase;
-    font-size: 30px;
-    margin: 0;
-  }
-  select {
-    font-weight: bolder;
-    font-size: 30px;
-    text-align: center;
-    margin: 0;
-  }
-`;
-
-const ButtonContainer = styled.div`
-  flex: 1 1 100%;
-  button {
-    font-size: 30px;
-  }
-`;
-
-const HitDieContainer = styled.h3`
-  flex: 1 1;
-  font-size: 30px;
-  margin: 0;
-  color: white;
-  background: green;
-`;
+// styles
+import {
+  Form,
+  Label,
+  ButtonContainer,
+  HitDieContainer,
+  AppSection
+} from "./AppStyled";
 
 export default function App() {
-  const [life, setLife] = useState(0);
+  const [hitDie, setHitDie] = useState(0);
+  const formElement = useRef(null);
 
-  const getFormValues = (event) => {
-    const { constitution, nivel, className } = event.target;
+  const getFormValues = (formElement) => {
+    const { constitution, nivel, className } = formElement.current;
     const classData = {
       constitution: constitution.value,
       nivel: nivel.value,
@@ -73,20 +40,24 @@ export default function App() {
     return totalLife;
   };
 
+  const updateHitDie = () => {
+    const formValues = getFormValues(formElement);
+    const totalLife = calcTotalLife(formValues);
+    setHitDie(totalLife);
+  };
+
   const formSubmitEvent = (event) => {
     event.preventDefault();
-    const formValues = getFormValues(event);
-    const totalLife = calcTotalLife(formValues);
-    console.log(totalLife);
-    setLife(totalLife);
+    updateHitDie();
   };
 
   return (
-    <div className="App">
-      <Form onSubmit={formSubmitEvent}>
+    <AppSection className="App">
+      <Form onSubmit={formSubmitEvent} ref={formElement}>
+        <HitDieContainer>{hitDie}</HitDieContainer>
         <Label>
           <h3>Class</h3>
-          <select name="className">
+          <select name="className" onChange={formSubmitEvent}>
             {classList.map(({ name, hitDie }, index) => {
               return (
                 <option key={index} value={hitDie}>
@@ -100,23 +71,19 @@ export default function App() {
         <Counter
           name="constitution"
           description="constitution"
-          maxNumber="5"
-          minimumNumber="-4"
+          maxNumber={5}
+          minimumNumber={-4}
+          changeEvent={updateHitDie}
         />
         <Counter
           name="nivel"
           description="nivel"
-          maxNumber="20"
-          minimumNumber="1"
-          initialNumber="1"
+          maxNumber={20}
+          minimumNumber={1}
+          initialNumber={1}
+          changeEvent={updateHitDie}
         />
-
-        <ButtonContainer>
-          <button type="input">calculate</button>
-        </ButtonContainer>
-
-        <HitDieContainer>{life}</HitDieContainer>
       </Form>
-    </div>
+    </AppSection>
   );
 }
