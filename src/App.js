@@ -108,10 +108,11 @@ export default function App() {
           description="nivel"
           maxNumber="20"
           minimumNumber="1"
+          initialNumber="1"
         />
 
         <ButtonContainer>
-          <button type="input">Calcular</button>
+          <button type="input">calculate</button>
         </ButtonContainer>
 
         <HitDieContainer>{life}</HitDieContainer>
